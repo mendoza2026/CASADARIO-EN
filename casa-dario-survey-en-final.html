@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Casa Dario — Encuesta</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400;1,600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #faf6ed; color: #2d2419; min-height: 100vh; display: flex; justify-content: center; padding: 3rem 1.5rem; }
+.cd { max-width: 620px; width: 100%; }
+.cd-tag { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #c97b4d; margin-bottom: 12px; }
+.cd-tagline { font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 600; font-style: italic; line-height: 1.25; color: #2d2419; margin-bottom: 14px; border-left: 3px solid #c97b4d; padding-left: 1.25rem; }
+.cd-desc { font-size: 15px; color: #7a6e5d; line-height: 1.7; margin-bottom: 2.5rem; }
+.cd-progress { display: flex; gap: 4px; margin-bottom: 1.75rem; }
+.cd-dot { height: 3px; border-radius: 2px; flex: 1; background: #e6dfd0; transition: background 0.3s; }
+.cd-dot.done { background: #4a6741; }
+.cd-dot.active { background: #c97b4d; }
+.cd-step { display: none; }
+.cd-step.active { display: block; }
+.cd-qnum { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #7a6e5d; margin-bottom: 6px; }
+.cd-q { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600; line-height: 1.35; margin-bottom: 6px; }
+.cd-hint { font-size: 13px; color: #7a6e5d; margin-bottom: 1.5rem; line-height: 1.6; }
+.cd-opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
+.cd-opt { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid #e6dfd0; border-radius: 8px; cursor: pointer; background: #fff; font-size: 14px; color: #2d2419; text-align: left; width: 100%; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.cd-opt:hover { border-color: #c2b9a8; background: #f5f0e8; }
+.cd-opt.sel { border-color: #4a6741; background: #f0f5ee; color: #3a5234; }
+.cd-opt.sel-multi { border-color: #4a6741; background: #f0f5ee; color: #3a5234; }
+.cd-circle { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #c2b9a8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.cd-opt.sel .cd-circle { border-color: #4a6741; background: #4a6741; }
+.cd-opt.sel .cd-circle::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
+.cd-square { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #c2b9a8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.cd-opt.sel-multi .cd-square { border-color: #4a6741; background: #4a6741; }
+.cd-opt.sel-multi .cd-square::after { content: '✓'; color: white; font-size: 11px; font-weight: 700; }
+input, textarea { width: 100%; border: 1px solid #e6dfd0; border-radius: 8px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #2d2419; background: #fff; outline: none; transition: border-color 0.15s; margin-bottom: 12px; }
+textarea { resize: vertical; min-height: 90px; margin-bottom: 1.5rem; }
+input:focus, textarea:focus { border-color: #4a6741; }
+.cd-nav { display: flex; gap: 12px; margin-top: 0.5rem; }
+.btn-next { padding: 11px 26px; background: #4a6741; color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
+.btn-next:hover { background: #3a5234; }
+.btn-back { padding: 11px 16px; background: transparent; color: #7a6e5d; border: 1px solid #e6dfd0; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; }
+.btn-back:hover { border-color: #c2b9a8; color: #2d2419; }
+.cd-thank { display: none; text-align: center; padding: 3rem 1rem; }
+.cd-icon { width: 60px; height: 60px; border-radius: 50%; background: #f0f5ee; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-size: 26px; }
+.cd-thank h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-style: italic; margin-bottom: 10px; }
+.cd-thank p { font-size: 14px; color: #7a6e5d; line-height: 1.7; max-width: 400px; margin: 0 auto; }
+.sending { text-align: center; padding: 2rem; color: #7a6e5d; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="cd">
+  <div class="cd-tag">Casa Dario · Hội An 2026</div>
+  <div class="cd-tagline">Healthy home-cooked dinners, Italian chef.</div>
+  <div class="cd-desc">Hi, I'm Dario, an Italian chef with many years of experience behind me. I'm about to launch something new here in Hội An — Italian, Mediterranean and healthy dinners, Monday to Friday, delivered to your door. Before I get started, I need to get to know the community better and understand what people are looking for. Can you spare 3 minutes?</div>
+  <div class="cd-progress" id="prog"></div>
+  <div id="form">
+    <div class="cd-step active">
+      <div class="cd-qnum">1 of 10</div>
+      <div class="cd-q">What does your household look like?</div>
+      <div class="cd-hint">I cook for one, for two or for the whole family.</div>
+      <div class="cd-opts">
+        <button class="cd-opt" onclick="sel(this,0)"><span class="cd-circle"></span>Just me</button>
+        <button class="cd-opt" onclick="sel(this,0)"><span class="cd-circle"></span>Couple, no kids</button>
+        <button class="cd-opt" onclick="sel(this,0)"><span class="cd-circle"></span>Family with kids (1-2)</button>
+        <button class="cd-opt" onclick="sel(this,0)"><span class="cd-circle"></span>Family with kids (3+)</button>
+      </div>
+      <div class="cd-nav"><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">2 of 10</div>
+      <div class="cd-q">What is your biggest challenge with weeknight dinners?</div>
+      <div class="cd-hint">Be honest — it's exactly what I need to know.</div>
+      <div class="cd-opts">
+        <button class="cd-opt" onclick="sel(this,1)"><span class="cd-circle"></span>Deciding what to have for dinner every day</button>
+        <button class="cd-opt" onclick="sel(this,1)"><span class="cd-circle"></span>Finding good quality ingredients</button>
+        <button class="cd-opt" onclick="sel(this,1)"><span class="cd-circle"></span>No time to cook</button>
+        <button class="cd-opt" onclick="sel(this,1)"><span class="cd-circle"></span>Delivery options aren't healthy enough</button>
+        <button class="cd-opt" onclick="sel(this,1)"><span class="cd-circle"></span>Getting kids to eat well</button>
+      </div>
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">3 of 10</div>
+      <div class="cd-q">Every week I'll publish a menu of Italian, Mediterranean and healthy dishes. You choose. I cook and deliver to your door, Monday to Friday. Would you sign up?</div>
+      <div class="cd-hint">Using the finest fresh ingredients from Hội An. Cooked by me, with over 15 years of experience.</div>
+      <div class="cd-opts">
+        <button class="cd-opt" onclick="sel(this,2)"><span class="cd-circle"></span>Yes, sign me up without hesitation</button>
+        <button class="cd-opt" onclick="sel(this,2)"><span class="cd-circle"></span>Depends on the price and menu</button>
+        <button class="cd-opt" onclick="sel(this,2)"><span class="cd-circle"></span>I'd like to try it first</button>
+        <button class="cd-opt" onclick="sel(this,2)"><span class="cd-circle"></span>I don't think it's for me</button>
+      </div>
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">4 of 10</div>
+      <div class="cd-q">How many dinners per week would you like to receive?</div>
+      <div class="cd-hint">No commitment — I just want to understand what fits best into your routine.</div>
+      <div class="cd-opts">
+        <button class="cd-opt" onclick="sel(this,3)"><span class="cd-circle"></span>2 or 3 dinners per week</button>
+        <button class="cd-opt" onclick="sel(this,3)"><span class="cd-circle"></span>4 or 5 dinners per week (Monday to Friday)</button>
+        <button class="cd-opt" onclick="sel(this,3)"><span class="cd-circle"></span>Just when I feel like it, no fixed plan</button>
+      </div>
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">5 of 10</div>
+      <div class="cd-q">How much would you be willing to pay for 4 dinners per week for a family of 4?</div>
+      <div class="cd-hint">Total weekly price, delivery included.</div>
+      <div class="cd-opts">
+        
+        <button class="cd-opt" onclick="sel(this,4)"><span class="cd-circle"></span>500k – 800k VND / week</button>
+        <button class="cd-opt" onclick="sel(this,4)"><span class="cd-circle"></span>800k – 1.2M VND / week</button>
+        <button class="cd-opt" onclick="sel(this,4)"><span class="cd-circle"></span>1.2M – 1.6M VND / week</button>
+        <button class="cd-opt" onclick="sel(this,4)"><span class="cd-circle"></span>More than 1.6M VND / week</button>
+      </div>
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">6 of 10</div>
+      <div class="cd-q">Do you have any dietary needs at home?</div>
+      <div class="cd-hint">You can choose more than one option.</div>
+      <div class="cd-opts" id="multi-diet">
+        <button class="cd-opt" onclick="multiSel(this,5)"><span class="cd-square"></span>Gluten-free</button>
+        <button class="cd-opt" onclick="multiSel(this,5)"><span class="cd-square"></span>Vegan</button>
+        <button class="cd-opt" onclick="multiSel(this,5)"><span class="cd-square"></span>Vegetarian</button>
+        <button class="cd-opt" onclick="multiSel(this,5)"><span class="cd-square"></span>Kids with very specific tastes</button>
+        <button class="cd-opt" onclick="multiSel(this,5)"><span class="cd-square"></span>Allergies (nuts, dairy, etc.)</button>
+        <button class="cd-opt" onclick="multiSel(this,5)"><span class="cd-square"></span>None in particular</button>
+      </div>
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">7 of 10</div>
+      <div class="cd-q">Which area or neighbourhood do you live in?</div>
+      <div class="cd-hint">This helps me decide where to set up the kitchen and plan delivery routes.</div>
+      <div class="cd-opts">
+        <button class="cd-opt" onclick="sel(this,6)"><span class="cd-circle"></span>An Bàng / Cẩm An</button>
+        <button class="cd-opt" onclick="sel(this,6)"><span class="cd-circle"></span>Cửa Đại</button>
+        <button class="cd-opt" onclick="sel(this,6)"><span class="cd-circle"></span>Old Town / Centre</button>
+        <button class="cd-opt" onclick="sel(this,6)"><span class="cd-circle"></span>Cẩm Hà / Điện Bàn</button>
+        <button class="cd-opt" onclick="sel(this,6)"><span class="cd-circle"></span>Da Nang South</button>
+        <button class="cd-opt" onclick="sel(this,6)"><span class="cd-circle"></span>Other area</button>
+      </div>
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">8 of 10</div>
+      <div class="cd-q">What would make you say yes without thinking twice?</div>
+      <div class="cd-hint">Anything — type of dishes, timing, conditions. Tell me.</div>
+      <textarea id="open-ans" placeholder="Write anything you'd like..."></textarea>
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">9 of 10</div>
+      <div class="cd-q">What is your email address?</div>
+      <div class="cd-hint">To let you know when we launch. No spam, just the important stuff.</div>
+      <input type="email" id="email-ans" placeholder="your@email.com">
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="next()">Next</button></div>
+    </div>
+    <div class="cd-step">
+      <div class="cd-qnum">10 of 10</div>
+      <div class="cd-q">And your WhatsApp number?</div>
+      <div class="cd-hint">Optional, but it's the quickest way to stay in touch.</div>
+      <input type="tel" id="wa-ans" placeholder="+84 ...">
+      <div class="cd-nav"><button class="btn-back" onclick="back()">Back</button><button class="btn-next" onclick="finish()">Send answers</button></div>
+    </div>
+  </div>
+  <div class="cd-thank" id="ty" style="display:none">
+    <div class="cd-icon">🍝</div>
+    <h2>Grazie mille!</h2>
+    <p>Every answer helps me build something that truly fits your life here in Hội An. I'll read it personally and take it into account.</p>
+  </div>
+</div>
+<script>
+const T=10;let c=0;const a={};
+const labels=['Household','Biggest challenge','Would you sign up?','Dinners/week','Price','Diet','Area','Open answer','Email','WhatsApp'];
+function prog(){const b=document.getElementById('prog');b.innerHTML='';for(let i=0;i<T;i++){const d=document.createElement('div');d.className='cd-dot'+(i<c?' done':i===c?' active':'');b.appendChild(d);}}
+function sel(btn,s){btn.closest('.cd-opts').querySelectorAll('.cd-opt').forEach(o=>o.classList.remove('sel'));btn.classList.add('sel');a[s]=btn.textContent.trim();}
+function multiSel(btn,s){btn.classList.toggle('sel-multi');a[s]=[...btn.closest('.cd-opts').querySelectorAll('.cd-opt.sel-multi')].map(b=>b.textContent.trim()).join(', ');}
+function canGo(){if(c===5)return document.querySelectorAll('#multi-diet .cd-opt.sel-multi').length>0;if(c>=7)return true;return a[c]!==undefined;}
+function next(){if(!canGo())return;c++;show();}
+function back(){if(c>0){c--;show();}}
+function show(){document.querySelectorAll('.cd-step').forEach((s,i)=>s.classList.toggle('active',i===c));prog();}
+function finish(){
+  a[7]=document.getElementById('open-ans').value.trim();
+  a[8]=document.getElementById('email-ans').value.trim();
+  a[9]=document.getElementById('wa-ans').value.trim();
+  let body='New response — Casa Dario Survey (EN)\n\n';
+  for(let i=0;i<T;i++){body+=labels[i]+': '+(a[i]||'—')+'\n';}
+  const mailto='mailto:Cabrera.mendoza86@gmail.com'
+    +'?subject='+encodeURIComponent('🍝 New response — Casa Dario Survey')
+    +'&body='+encodeURIComponent(body);
+  window.location.href=mailto;
+  document.getElementById('form').style.display='none';
+  document.getElementById('prog').style.display='none';
+  document.getElementById('ty').style.display='block';
+}
+prog();
+</script>
+</body>
+</html>
